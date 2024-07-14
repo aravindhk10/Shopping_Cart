@@ -1,0 +1,29 @@
+<h2 class="text-center pt-2">Login</h2>
+
+<section>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="/login" method="post">
+            {{#if loginErr}}
+                <p class="error" style="color: red;">Invalid Username or Password</p>
+            {{/if}}
+            
+
+                <div class="mb-3">
+                    <label class="form-label">Email address</label>
+                    <input type="email" class="form-control" name="email" placeholder="Enter Email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" placeholder="Enter Password">
+                </div>
+                <div class="mb-3">
+                    <a href="/signup" style="text-decoration: none;">Create new account?</a>
+                </div>
+                <div class="mb-3 text-end">
+                <button type="submit" class="btn btn-primary ">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

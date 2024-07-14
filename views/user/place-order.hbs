@@ -1,0 +1,110 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mt-4">
+
+            <form action="" id="checkoutform">
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" name="address">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pincode</label>
+                    <input type="text" class="form-control" name="pincode">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mobile</label>
+                    <input type="text" class="form-control" name="mobile">
+                    <input type="text" name="userId" id="" value="{{user._id}}" hidden>
+                </div>
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mt-5 ms-5" style="width: 65%;">
+                <div class="card-body">
+                    <h5 class="card-title">Total Amount: Rs.{{total}}</h5>
+                    <hr>
+                    <h5>Payment Method</h5>
+                    <div class="payment">
+
+
+                        <input type="radio" id="COD" name="paymentmethod" value="COD">
+                        <label for="COD">COD</label>
+                        <br>
+                        <input type="radio" id="onlinepayment" name="paymentmethod" value="Online">
+                        <label for="onlinepayment">Online Payment</label>
+                        <button class="btn btn-primary float-end me-3" type="submit">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $("#checkoutform").submit((e) => {
+        e.preventDefault()
+        $.ajax({
+            url: '/place-order',
+            method: 'POST',
+            data: $("#checkoutform").serialize(),
+            success: (response) => {
+                if (response.cod_Success) {
+                    location.href = '/ordersuccess'
+                }
+                else {
+                    razorpayPayment(response)
+                }
+            }
+
+        })
+    })
+
+    function razorpayPayment(order) {
+        var options = {
+            "key": "rzp_test_IvGWMBpENteAE2", // Enter the Key ID generated from the Dashboard
+            "amount": "50000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Aravind's Shopping Cart", //your business name
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                verifyPayment(response, order)
+            },
+            "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                "name": "Gaurav Kumar", //your customer's name
+                "email": "gaurav.kumar@example.com",
+                "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+    function verifyPayment(payment, order){
+        $.ajax({
+            url:'/verify-payment', 
+            data:{
+                payment,
+                order
+            },
+            method:'POST',
+            success:(response)=>{
+                console.log(response.success)
+                if (response.success){
+                    location.href='/ordersuccess'
+                }
+                else{
+                    alert('Payment Failed')
+                }
+            }
+        })
+    }
+</script>
